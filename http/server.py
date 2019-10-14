@@ -34,7 +34,7 @@ while True:
     # aguarda por novas conexoes
     client_connection, client_address = listen_socket.accept()
     # o metodo .recv recebe os dados enviados por um cliente atraves do socket
-    request = client_connection.recv(1024)
+    request = client_connection.recv(2048)
     request = request.decode('utf-8')
     # imprime na tela o que o cliente enviou ao servidor
     print ('Request: ',request)
@@ -49,14 +49,7 @@ while True:
     
     if(method == "GET" and  way[0] == '/' and  version.split('/')[0] == 'HTTP' and 
     (version.split('/')[1] == '0.9' or version.split('/')[1] == '1.0' or version.split('/')[1] == '1.1')):
-        if(way == '/'):
-            # abrir aquivo index.html
-            index = open('index.html')
-            # declaracao da resposta do servidor
-            http_response = "HTTP/1.1 200 OK\r\n\r\n" + index.read() +'\r\n'
-            # Fecha o arquivo index.html
-            index.close()
-        elif(way == '/favicon.ico'):
+        if(way == '/favicon.ico'):
             pass
         elif(os.path.isfile('.' + way) == True):
             # abrir aquivo index.html
@@ -65,9 +58,9 @@ while True:
             http_response = "HTTP/1.1 200 OK\r\n\r\n" + index.read() +'\r\n'
             # Fecha o arquivo index.html
             index.close()
-        elif(os.path.isfile('.' + way + 'index.html') == True):
+        elif(os.path.isfile('.' + way + '/index.html') == True):
             # abrir aquivo index.html
-            index = open('.' + way + 'index.html')
+            index = open('.' + way + '/index.html')
             # declaracao da resposta do servidor
             http_response = "HTTP/1.1 200 OK\r\n\r\n" + index.read() +'\r\n'
             # Fecha o arquivo index.html
