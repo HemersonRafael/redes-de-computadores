@@ -34,7 +34,7 @@ while True:
     # aguarda por novas conexoes
     client_connection, client_address = listen_socket.accept()
     # o metodo .recv recebe os dados enviados por um cliente atraves do socket
-    request = client_connection.recv(2048)
+    request = client_connection.recv(4096)
     request = request.decode('utf-8')
     # imprime na tela o que o cliente enviou ao servidor
     print ('Request: ',request)
@@ -43,14 +43,24 @@ while True:
    
     slised = firstLine[0].split(' ')
     
-    method = slised[0]
-    way = slised[1]
-    version = slised[2]
-    
-    if(method == "GET" and  way[0] == '/' and  version.split('/')[0] == 'HTTP' and 
+    if(len(slised) == 3):
+        method = slised[0]
+        way = slised[1]
+        version = slised[2]
+    else:
+        method = ' '
+        way = ' '
+        version = ' '
+    #Verificar se metodo, caminho e versao foi solicitado corretamente
+    if(method == "GET" and  way[0] == '/' and  version.split('/')[0] == 'HTTP' and
     (version.split('/')[1] == '0.9' or version.split('/')[1] == '1.0' or version.split('/')[1] == '1.1')):
         if(way == '/favicon.ico'):
-            pass
+            f = open("./favicon.ico",'rb')
+            # servidor retorna o que foi solicitado pelo cliente (neste caso a resposta e generica)
+            client_connection.sendall(f.read())
+            # encerra a conexao
+            client_connection.close()
+            f.close()
         elif(os.path.isfile('.' + way) == True):
             # abrir aquivo index.html
             index = open('.' + way)
@@ -58,6 +68,10 @@ while True:
             http_response = "HTTP/1.1 200 OK\r\n\r\n" + index.read() +'\r\n'
             # Fecha o arquivo index.html
             index.close()
+            # servidor retorna o que foi solicitado pelo cliente (neste caso a resposta e generica)
+            client_connection.send(http_response.encode('utf-8'))
+            # encerra a conexao
+            client_connection.close()
         elif(os.path.isfile('.' + way + '/index.html') == True):
             # abrir aquivo index.html
             index = open('.' + way + '/index.html')
@@ -65,13 +79,21 @@ while True:
             http_response = "HTTP/1.1 200 OK\r\n\r\n" + index.read() +'\r\n'
             # Fecha o arquivo index.html
             index.close()
+            # servidor retorna o que foi solicitado pelo cliente (neste caso a resposta e generica)
+            client_connection.send(http_response.encode('utf-8'))
+            # encerra a conexao
+            client_connection.close()
         else:
             # abrir aquivo index.html
-            index = open('erro404.html')
+            index = open('error404.html')
             # declaracao da resposta do servidor
             http_response = "HTTP/1.1 404 OK\r\n\r\n" + index.read() +'\r\n'
             # Fecha o arquivo index.html
             index.close()
+            # servidor retorna o que foi solicitado pelo cliente (neste caso a resposta e generica)
+            client_connection.send(http_response.encode('utf-8'))
+            # encerra a conexao
+            client_connection.close()
     else:
             # abrir aquivo index.html
             index = open('badResquest.html')
@@ -79,13 +101,10 @@ while True:
             http_response = "HTTP/1.1 400 OK\r\n\r\n" + index.read() +'\r\n'
             # Fecha o arquivo index.html
             index.close()
+            # servidor retorna o que foi solicitado pelo cliente (neste caso a resposta e generica)
+            client_connection.send(http_response.encode('utf-8'))
+            # encerra a conexao
+            client_connection.close()
 
-    # servidor retorna o que foi solicitado pelo cliente (neste caso a resposta e generica)
-    client_connection.send(http_response.encode('utf-8'))
-    # encerra a conexao
-    client_connection.close()
-    
 # encerra o socket do servidor
 listen_socket.close()
-
-
